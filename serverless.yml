@@ -1,0 +1,43 @@
+service: contract
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-2:943766074476:table/contractsTable
+
+functions:
+  contractCreate:
+    handler: src/contractCreate.contractCreate
+    events:
+      - httpApi:
+          path: /contract/create
+          method: post
+  contractDelete:
+    handler: src/contractDelete.contractDelete
+    events:
+      - httpApi:
+          path: /contract/delete
+          method: post
+
+resources:
+  Resources:
+    contractsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: contractsTable
+        AttributeDefinitions:
+          - AttributeName: idContract
+            AttributeType: S
+        KeySchema:
+          - AttributeName: idContract
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
